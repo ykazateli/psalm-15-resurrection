@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Псалом 15: Воскресение | Указатели</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Comic Neue', 'Comic Sans MS', sans-serif;
+            background: #b48a62;
+            background-image: radial-gradient(circle at 10% 20%, rgba(218, 178, 115, 0.08) 0%, rgba(0,0,0,0) 50%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            max-width: 850px;
+            width: 100%;
+            background: #fff6e8;
+            border-radius: 48px;
+            box-shadow: 0 20px 35px rgba(100, 70, 30, 0.15);
+            padding: 30px 30px 40px;
+            border: 1px solid #f0dbb4;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .header .studio-link {
+            display: inline-block;
+            font-size: 1rem;
+            color: #4A90D9;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid #4A90D9;
+            padding-bottom: 2px;
+            transition: 0.2s;
+        }
+
+        .header .studio-link:hover {
+            color: #2c6aa0;
+            border-bottom-color: #2c6aa0;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #4a3520;
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        .header .subtitle {
+            font-size: 1rem;
+            color: #7a5a3a;
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        .screen {
+            display: none;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .screen h2 {
+            font-size: 1.5rem;
+            color: #4a3520;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        /* Персонаж */
+        .character-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .character-wrapper img {
+            width: 200px;
+            height: auto;
+            display: block;
+        }
+
+        /* Речь Кристины */
+        .speech-bubble {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 20px 25px;
+            border: 1px solid #e6dacb;
+            position: relative;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #3e2c1a;
+            text-align: left;
+        }
+
+        .speech-bubble .name {
+            font-weight: 700;
+            color: #b48a62;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        /* Текст Псалма */
+        .psalm-text {
+            font-size: 1.15rem;
+            line-height: 2.4;
+            color: #3e2c1a;
+            background: #ffffff;
+            padding: 25px 30px;
+            border-radius: 20px;
+            border: 1px solid #e6dacb;
+            margin-bottom: 20px;
+        }
+
+        .psalm-text .verse-number {
+            font-size: 0.7rem;
+            color: #b48a62;
+            font-weight: 700;
+            vertical-align: super;
+            margin-right: 4px;
+        }
+
+        .word-wrapper {
+            display: inline-block;
+            position: relative;
+        }
+
+        .clickable-word {
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .clickable-word:hover {
+            background: #e6dacb;
+        }
+
+        /* Чёрная отметка (смерть) */
+        .clickable-word.found-black {
+            color: #000000;
+            text-decoration: underline;
+            text-decoration-color: #000000;
+            text-underline-offset: 4px;
+        }
+
+        /* Зелёная отметка (жизнь) */
+        .clickable-word.found-green {
+            color: #2e7d32;
+            text-decoration: underline;
+            text-decoration-color: #2e7d32;
+            text-underline-offset: 4px;
+        }
+
+        /* Иконки над словами */
+        .word-wrapper .marker {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .word-wrapper .marker.show {
+            opacity: 1;
+        }
+
+        /* Таблица */
+        .nt-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .nt-table th {
+            background: #b48a62;
+            color: #fff;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .nt-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #f0e6d8;
+            color: #3e2c1a;
+            vertical-align: top;
+        }
+
+        .nt-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .nt-table .word-cell {
+            font-weight: 700;
+            color: #b48a62;
+        }
+
+        /* Размышление */
+        .question-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e6dacb;
+            margin-bottom: 20px;
+        }
+
+        .question-box .q {
+            font-weight: 600;
+            color: #4a3520;
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+        }
+
+        .question-box .answer {
+            display: none;
+            margin-top: 10px;
+            padding: 14px 16px;
+            background: #f4ede4;
+            border-radius: 12px;
+            color: #3e2c1a;
+            line-height: 1.6;
+            border-left: 3px solid #b48a62;
+        }
+
+        .question-box .answer.show {
+            display: block;
+        }
+
+        .reveal-btn {
+            background: #b48a62;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+
+        .reveal-btn:hover {
+            background: #9a704a;
+            transform: translateY(-2px);
+        }
+
+        /* Вывод */
+        .conclusion-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e6dacb;
+            margin-bottom: 20px;
+        }
+
+        .conclusion-box p {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #3e2c1a;
+            margin-bottom: 10px;
+        }
+
+        .conclusion-box .final-verse {
+            font-style: italic;
+            color: #b48a62;
+            margin-top: 10px;
+            padding: 15px;
+            background: #f4ede4;
+            border-radius: 12px;
+            font-size: 0.95rem;
+        }
+
+        /* Кнопки */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-buttons button {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        button {
+            background: #b48a62;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #9a704a;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #d5c4b0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button.secondary {
+            background: #e6dacb;
+            color: #4a3520;
+        }
+
+        button.secondary:hover {
+            background: #d5c4b0;
+        }
+
+        /* Футер */
+        .footer {
+            margin-top: 30px;
+            border-top: 1px solid #e6dacb;
+            padding-top: 20px;
+            text-align: center;
+        }
+
+        .footer .studio-link {
+            color: #4A90D9;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-bottom: 1px solid #4A90D9;
+            padding-bottom: 2px;
+        }
+
+        .footer .small-note {
+            display: block;
+            margin-top: 6px;
+            color: #a58d7a;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 600px) {
+            .app-container { padding: 20px 15px; }
+            .header h1 { font-size: 1.6rem; }
+            .character-wrapper img { width: 150px; }
+            .speech-bubble { font-size: 1rem; padding: 15px 18px; }
+            .psalm-text { font-size: 1rem; padding: 18px 20px; line-height: 2.4; }
+            .word-wrapper .marker { font-size: 1rem; top: -24px; }
+            .nt-table { font-size: 0.85rem; }
+            .nt-table th, .nt-table td { padding: 8px 6px; }
+            .nav-buttons { flex-direction: column; }
+            button { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- ШАПКА -->
+        <div class="header">
+            <a href="https://vk.com/ykazateli_of_christ" target="_blank" class="studio-link">
+                🕯️ Библейская студия анимации «Указатели»
+            </a>
+            <h1>📖 Псалом 15: Воскресение</h1>
+            <p class="subtitle">Христос в Псалмах — урок 2</p>
+        </div>
+
+        <!-- ЭКРАН 1: ВСТУПЛЕНИЕ -->
+        <div id="screen1" class="screen active">
+            <div class="character-wrapper">
+                <img src="kristina-holding.gif" alt="Кристина">
+            </div>
+            <div class="speech-bubble">
+                <span class="name">Кристина:</span>
+                Привет! Мы продолжаем исследование. Сегодня — <strong>Псалом 15</strong>. Это пророчество о воскресении Христа. Я подготовила для тебя особое задание: ты будешь отмечать слова <strong>двумя цветами</strong>. Готов? Тогда начнём!
+            </div>
+            <div style="text-align:center;">
+                <button onclick="goToStep(2)">📖 Читать Псалом</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 2: НАБЛЮДЕНИЕ -->
+        <div id="screen2" class="screen">
+            <h2>👀 Наблюдение</h2>
+
+            <div class="character-wrapper">
+                <img src="kristina-two-pencils.gif" alt="Кристина с двумя карандашами">
+            </div>
+            <div class="speech-bubble">
+                <span class="name">Кристина:</span>
+                🖤 Нажми на слова, которые говорят о <strong>смерти</strong> — они отметятся <strong>чёрным</strong>.<br>
+                💚 Нажми на слова, которые говорят о <strong>жизни</strong> — они отметятся <strong>зелёным</strong>.<br>
+                Подсказка: всего <strong>6 слов</strong>.
+            </div>
+
+            <div class="psalm-text" id="psalmText">
+                <span class="verse-number">10</span> Ты не оставишь души моей в <span class="word-wrapper"><span class="clickable-word" data-color="black">аде</span><span class="marker">🖤</span></span> и не дашь святому Твоему увидеть <span class="word-wrapper"><span class="clickable-word" data-color="black">тление</span><span class="marker">🖤</span></span>,<br>
+                <span class="verse-number">11</span> Ты укажешь мне <span class="word-wrapper"><span class="clickable-word" data-color="green">путь жизни</span><span class="marker">💚</span></span>: полнота <span class="word-wrapper"><span class="clickable-word" data-color="green">радостей</span><span class="marker">💚</span></span> пред лицем Твоим, <span class="word-wrapper"><span class="clickable-word" data-color="green">блаженство</span><span class="marker">💚</span></span> в деснице Твоей <span class="word-wrapper"><span class="clickable-word" data-color="green">вовек</span><span class="marker">💚</span></span>.
+            </div>
+
+            <div class="nav-buttons">
+                <button class="secondary" onclick="goToStep(1)">⬅️ Назад</button>
+                <button onclick="goToStep(3)" id="toStep3" disabled>➡️ Дальше</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 3: СВЯЗЬ С НОВЫМ ЗАВЕТОМ -->
+        <div id="screen3" class="screen">
+            <h2>🔗 Связь с Новым Заветом</h2>
+
+            <div class="character-wrapper">
+                <img src="kristina-holding.gif" alt="Кристина">
+            </div>
+            <div class="speech-bubble">
+                <span class="name">Кристина:</span>
+                Отлично! Ты нашёл все слова. А теперь посмотри, где этот Псалом цитируется в Новом Завете.
+            </div>
+
+            <table class="nt-table">
+                <thead>
+                    <tr>
+                        <th>Слово из Псалма</th>
+                        <th>Где цитируется</th>
+                        <th>Что это значит</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="word-cell">«не оставишь души моей в аде» (ст. 10)</td>
+                        <td>Деян. 2:27</td>
+                        <td>Бог не оставил Христа в смерти</td>
+                    </tr>
+                    <tr>
+                        <td class="word-cell">«не дашь святому Твоему увидеть тление» (ст. 10)</td>
+                        <td>Деян. 2:27</td>
+                        <td>Тело Христа не истлело — Он воскрес</td>
+                    </tr>
+                    <tr>
+                        <td class="word-cell">«Ты укажешь мне путь жизни» (ст. 11)</td>
+                        <td>Деян. 2:28</td>
+                        <td>Через воскресение открыт путь к вечной жизни</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="nav-buttons">
+                <button class="secondary" onclick="goToStep(2)">⬅️ Назад</button>
+                <button onclick="goToStep(4)">➡️ Дальше</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 4: РАЗМЫШЛЕНИЕ -->
+        <div id="screen4" class="screen">
+            <h2>🤔 Размышление</h2>
+
+            <div class="character-wrapper">
+                <img src="kristina-holding.gif" alt="Кристина">
+            </div>
+            <div class="speech-bubble">
+                <span class="name">Кристина:</span>
+                Посмотри на два цвета. Что они говорят тебе о Христе?
+            </div>
+
+            <div class="question-box">
+                <div class="q">💭 Подумай и ответь:</div>
+                <div class="answer" id="answerText">
+    <strong style="color: #000000;">Чёрные слова — о смерти</strong>, но они <strong>не исполнились</strong> над Христом: смерть не удержала Его.<br><br>
+    <strong style="color: #2e7d32;">Зелёные слова — о жизни</strong>, и они исполнились: Христос воскрес и дарует жизнь всем, кто верит в Него.
+</div>
+                <button class="reveal-btn" onclick="toggleAnswer()">💡 Показать ответ</button>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="secondary" onclick="goToStep(3)">⬅️ Назад</button>
+                <button onclick="goToStep(5)">➡️ Дальше</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 5: ВЫВОД -->
+        <div id="screen5" class="screen">
+            <h2>🕊️ Вывод</h2>
+
+            <div class="character-wrapper">
+                <img src="kristina-holding.gif" alt="Кристина">
+            </div>
+            <div class="speech-bubble">
+    <span class="name">Кристина:</span>
+    Псалом 15 показывает контраст: <strong style="color: #000000;">смерть отступила</strong> — <strong style="color: #2e7d32;">жизнь восторжествовала</strong>. Христос воскрес! И через Него мы получаем путь жизни, полноту радости и блаженство навеки.
+</div>
+
+            <div class="conclusion-box">
+                <p>
+                    <strong>Главная истина:</strong> Христос воскрес — смерть не удержала Его, и Он дарует нам жизнь.
+                </p>
+                <div class="final-verse">
+                    «Он прежде сказал о воскресении Христа, что не оставлена душа Его в аде, и плоть Его не видела истления»<br>
+                    <span style="font-style: normal; font-weight: 600; color: #4a3520;">— Деяния 2:31</span>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="secondary" onclick="goToStep(4)">⬅️ Назад</button>
+                <button onclick="resetAll()">🔄 Пройти заново</button>
+            </div>
+        </div>
+
+        <!-- ФУТЕР -->
+        <div class="footer">
+            <a href="https://vk.com/ykazateli_of_christ" target="_blank" class="studio-link">
+                🕯️ Исследуйте Писание вместе с «Указателями»
+            </a>
+            <span class="small-note">Серия «Христос в Псалмах» — урок 3</span>
+        </div>
+    </div>
+
+    <script>
+        // ============ ОТМЕТКА СЛОВ ============
+        const clickableWords = document.querySelectorAll('.clickable-word');
+        const toStep3Btn = document.getElementById('toStep3');
+        let markedCount = 0;
+        const totalWords = 6;
+
+        clickableWords.forEach(word => {
+            word.addEventListener('click', function() {
+                const wrapper = this.parentElement;
+                const marker = wrapper.querySelector('.marker');
+                const color = this.dataset.color;
+
+                // Если уже отмечено — снимаем отметку
+                if (this.classList.contains('found-black') || this.classList.contains('found-green')) {
+                    this.classList.remove('found-black', 'found-green');
+                    marker.classList.remove('show');
+                    markedCount--;
+                } else {
+                    // Определяем цвет по data-атрибуту
+                    if (color === 'black') {
+                        this.classList.add('found-black');
+                    } else if (color === 'green') {
+                        this.classList.add('found-green');
+                    }
+                    marker.classList.add('show');
+                    markedCount++;
+                }
+
+                // Активируем кнопку "Дальше", когда все слова отмечены
+                if (markedCount === totalWords) {
+                    toStep3Btn.disabled = false;
+                } else {
+                    toStep3Btn.disabled = true;
+                }
+            });
+        });
+
+        // ============ РАЗМЫШЛЕНИЕ ============
+        let answerVisible = false;
+
+        function toggleAnswer() {
+            const answer = document.getElementById('answerText');
+            const btn = document.querySelector('.reveal-btn');
+
+            if (!answerVisible) {
+                answer.classList.add('show');
+                btn.textContent = '🙈 Скрыть ответ';
+                answerVisible = true;
+            } else {
+                answer.classList.remove('show');
+                btn.textContent = '💡 Показать ответ';
+                answerVisible = false;
+            }
+        }
+
+        // ============ НАВИГАЦИЯ ============
+        function goToStep(stepNumber) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById('screen' + stepNumber).classList.add('active');
+            document.querySelector('.app-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function resetAll() {
+            clickableWords.forEach(word => {
+                word.classList.remove('found-black', 'found-green');
+                const marker = word.parentElement.querySelector('.marker');
+                if (marker) marker.classList.remove('show');
+            });
+            markedCount = 0;
+            toStep3Btn.disabled = true;
+
+            if (answerVisible) {
+                toggleAnswer();
+            }
+
+            goToStep(1);
+        }
+    </script>
+</body>
+</html>
